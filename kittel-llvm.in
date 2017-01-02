@@ -1,25 +1,25 @@
 FULLNAME=$1
-BASENAME=`basename $1 .c`
+BASENAME=${FULLNAME%.c}
 
 shift
 
 echo "Calling clang"
-@CLANG@ -Wall -Wextra -c -emit-llvm -O0 $FULLNAME -o $BASENAME.bc
+@CLANG@ -Wall -Wextra -c -emit-llvm -O0 "$FULLNAME" -o "$BASENAME.bc"
 if [ $? != 0 ]
 then
   exit 1
 fi
 
 echo "Calling llvm2kittel"
-./llvm2kittel $BASENAME.bc $* > $BASENAME.kittel
+./llvm2kittel "$BASENAME.bc" $* > "$BASENAME.kittel"
 if [ $? != 0 ]
 then
-  rm -f $BASENAME.kittel
+  rm -f "$BASENAME.kittel"
   exit 2
 fi
 
 echo "Calling kittel"
-./kittel $BASENAME.kittel > $BASENAME.kittel.proof
+./kittel "$BASENAME.kittel" > "$BASENAME.kittel.proof"
 if [ $? != 0 ]
 then
   echo "$BASENAME.kittel: failed"
